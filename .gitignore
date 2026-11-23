@@ -1,2 +1,6 @@
 /.venv/
 /venv/
+.env
+data.json
+data.json.tmp
+__pycache__/
