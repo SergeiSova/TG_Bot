@@ -11,7 +11,10 @@ try:
     with open('data.json', 'r') as data_file:
         data = json.load(data_file)
 except FileNotFoundError:
-    data = {'joinedUsers': {}, 'usergames': {}}
+    data = {}
+
+data.setdefault('joinedUsers', {})
+data.setdefault('usergames', {})
 
 max_players = 8
 
@@ -42,13 +45,19 @@ def start(message):
 
 @bot.message_handler(commands=['sendall'])
 def send_all(message):
-    if message.chat.id == adminID or adminID1:
-        bot.send_message(message.chat.id, 'Start')
-        for user_id, name in data['joinedUsers'].items():
-            bot.send_message(user_id, message.text[message.text.find(' '):])
-        bot.send_message(message.chat.id, 'Done')
-    else:
+    if message.chat.id not in (adminID, adminID1):
         bot.send_message(message.chat.id, 'Error')
+        return
+
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        bot.send_message(message.chat.id, 'Использование: /sendall текст сообщения')
+        return
+
+    bot.send_message(message.chat.id, 'Start')
+    for user_id, name in data['joinedUsers'].items():
+        bot.send_message(user_id, parts[1])
+    bot.send_message(message.chat.id, 'Done')
 
 
 @bot.message_handler(content_types=['text'])
